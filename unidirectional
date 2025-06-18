@@ -1,0 +1,50 @@
+module uni (
+    input wire [3:0] A,
+    input wire EN,
+    output wire [3:0] Y
+);
+    assign Y = EN ? A : 4'bz;  // Drive output only when EN is high
+endmodule
+
+`timescale 1ns / 1ps
+
+module uni_tb;
+
+    reg [3:0] A;
+    reg EN;
+    wire [3:0] Y;
+
+    integer i;
+
+    // Instantiate DUT
+    uni uut (.A(A), .EN(EN), .Y(Y));
+
+    initial begin
+        $display("Time\tEN\tA\tY");
+        $monitor("%g\t%b\t%b\t%b", $time, EN, A, Y);
+
+        // Phase 1: EN = 0 (output should be high impedance)
+        EN = 0;
+        for (i = 0; i < 16; i = i + 1) begin
+            A = i;
+            #10;
+        end
+
+        // Phase 2: EN = 1 (output should follow input)
+        EN = 1;
+        for (i = 0; i < 16; i = i + 1) begin
+            A = i;
+            #10;
+        end
+
+        $finish;
+    end
+
+    // Optional: For GTKWave or other VCD viewers
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, uni_tb);
+    end
+
+endmodule
+
