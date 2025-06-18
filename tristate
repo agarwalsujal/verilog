@@ -1,0 +1,50 @@
+module tristate_buffer (
+    input wire in,         // 1-bit data input
+    input wire ctrl,       // Control signal
+    output wire out        // Output (Z if ctrl is 0)
+);
+
+    assign out = ctrl ? in : 1'bz;
+
+endmodule
+
+
+
+
+
+
+`timescale 1ns / 1ps
+
+module tb_tristate_buffer;
+
+    reg in;
+    reg ctrl;
+    wire out;
+
+    // Instantiate the module
+    tristate_buffer uut (
+        .in(in),
+        .ctrl(ctrl),
+        .out(out)
+    );
+
+    initial begin
+        $display("Time | ctrl in | out");
+        $monitor("%4t |   %b    %b | %b", $time, ctrl, in, out);
+
+        // Test 1: ctrl = 0 → output should be Z
+        ctrl = 0; in = 1; #10;
+        
+        // Test 2: ctrl = 1 → output = in
+        ctrl = 1; in = 1; #10;
+
+        // Test 3: ctrl = 1 → output = in
+        ctrl = 1; in = 0; #10;
+
+        // Test 4: ctrl = 0 → output = Z
+        ctrl = 0; in = 0; #10;
+
+        $finish;
+    end
+
+endmodule
